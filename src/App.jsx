@@ -8,7 +8,8 @@ export default function App() {
     const [dice, setDice] = useState(allNewDice())
     const [tenzies, setTenzies] = useState(false)
     const [rolls, setRolls] = useState(0)
-    // const [time, setTime] = useState(0)
+    const [playing, setPlaying] = useState(false)
+    const [time, setTime] = useState(0)
     
     useEffect(() => {
         const allHeld = dice.every(die => die.isHeld)
@@ -16,8 +17,21 @@ export default function App() {
         const allSameValue = dice.every(die => die.value === firstValue)
         if (allHeld && allSameValue) {
             setTenzies(true)
+            setPlaying(false)
         }
     }, [dice])
+
+    useEffect(() => {
+    let interval;
+    if (playing) {
+      interval = setInterval(() => {
+        setTime((prevTime) => prevTime + 1);
+      }, 1000);
+    } else if (!playing) {
+      clearInterval(interval);
+    }
+    return () => clearInterval(interval);
+  }, [playing, tenzies]);
 
     function generateNewDie() {
         return {
@@ -43,11 +57,12 @@ export default function App() {
                     generateNewDie()
             }))
             setRolls(prevRols => prevRols + 1)
+            setPlaying(true)
         } else {
             setTenzies(false)
             setDice(allNewDice())
             setRolls(0)
-            // setTime(0)
+            setTime(0)
         }
     }
     
@@ -57,6 +72,7 @@ export default function App() {
                 {...die, isHeld: !die.isHeld} :
                 die
         }))
+        setPlaying(true)
     }
     
     const diceElements = dice.map(die => (
@@ -75,6 +91,7 @@ export default function App() {
             <p className="instructions">Roll until all dice are the same. 
             Click each die to freeze it at its current value between rolls.</p>
             <p className="instructions">You have rolled {rolls} times</p>
+            <h2 className="instructions">{time} sec.</h2>
             <div className="dice-container">
                 {diceElements}
             </div>
