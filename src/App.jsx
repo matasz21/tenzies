@@ -5,12 +5,19 @@ import Confetti from "react-confetti"
 
 export default function App() {
 
+    // Set dices
     const [dice, setDice] = useState(allNewDice())
+    // Tenzies === when win, playing === when either Roll button or any dice is pressed
     const [tenzies, setTenzies] = useState(false)
-    const [rolls, setRolls] = useState(0)
     const [playing, setPlaying] = useState(false)
+    // Counting how many times dies were rolled and how many seconds it took in one game
+    const [rolls, setRolls] = useState(0)
     const [time, setTime] = useState(0)
+    // Records from storage
+    const [storageRolls, setStorageRolls] = useState(localStorage.getItem("Rolls"))
+    const [storageSeconds, setStorageSeconds] = useState(localStorage.getItem("Seconds"))
     
+    // Checks for win
     useEffect(() => {
         const allHeld = dice.every(die => die.isHeld)
         const firstValue = dice[0].value
@@ -21,6 +28,7 @@ export default function App() {
         }
     }, [dice])
 
+    // Chronometer
     useEffect(() => {
     let interval;
     if (playing) {
@@ -32,6 +40,28 @@ export default function App() {
     }
     return () => clearInterval(interval);
   }, [playing, tenzies]);
+
+    //  communication with local storage
+    useEffect(() => {
+        if(localStorage.getItem("Rolls") === null){
+            localStorage.setItem("Rolls", JSON.stringify(0))
+        } 
+        else if((parseInt(localStorage.getItem("Rolls")) > rolls && tenzies === true) || (parseInt(localStorage.getItem("Rolls")) === 0 && tenzies === true)) {
+            localStorage.setItem("Rolls", JSON.stringify(rolls))
+            setStorageRolls(localStorage.getItem("Rolls"))
+        }
+
+        if(localStorage.getItem("Seconds") === null){
+            localStorage.setItem("Seconds", JSON.stringify(0))
+        } 
+        else if((parseInt(localStorage.getItem("Seconds")) > time && tenzies === true) || (parseInt(localStorage.getItem("Seconds")) === 0 && tenzies === true)) {
+            localStorage.setItem("Seconds", JSON.stringify(time))
+            setStorageSeconds(localStorage.getItem("Seconds"))
+        }
+
+        console.log(localStorage.getItem("Seconds", "Rolls"));
+        // eslint-disable-next-line
+    }, [tenzies])
 
     function generateNewDie() {
         return {
@@ -73,7 +103,7 @@ export default function App() {
                 die
         }))
         setPlaying(true)
-    }
+    }  
     
     const diceElements = dice.map(die => (
         <Die 
@@ -101,6 +131,10 @@ export default function App() {
             >
                 {tenzies ? "New Game" : "Roll"}
             </button>
+            <div className="show-score">
+                <h3>Best score: {storageRolls} rolls</h3>
+                <h3>Best time: {storageSeconds} sec.</h3>
+            </div>
         </main>
     )
 }
