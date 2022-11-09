@@ -8,7 +8,7 @@ export default function App() {
     const [dice, setDice] = useState(allNewDice())
     const [tenzies, setTenzies] = useState(false)
     const [rolls, setRolls] = useState(0)
-    const [time, setTime] = useState(0)
+    // const [time, setTime] = useState(0)
     
     useEffect(() => {
         const allHeld = dice.every(die => die.isHeld)
@@ -47,7 +47,7 @@ export default function App() {
             setTenzies(false)
             setDice(allNewDice())
             setRolls(0)
-            setTime(0)
+            // setTime(0)
         }
     }
     
